@@ -1,0 +1,42 @@
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+sns.set(font='SimHei')
+#这三行是为了可视化可以有中文
+duishu=int(input('请输入有多少个队伍参赛'))
+situation=np.array([[0,1,1,0,0],[0,0,1,1,1],[0,0,0,0,0],[1,0,1,0,1],[1,0,1,0,0]])
+#建立数组，第i行代表了第i队的胜负情况
+he=[]
+for i in range(0,duishu):
+    a1=situation[i]
+    s1=sum(a1)
+    he.append(s1)
+#he统计了每个队直接胜利后的总分，现在思考如何将间接胜利纳入，我认为如果想加入就要避免对直接胜利产生影响
+#也就是竖着列的权重要足够小，我们知道每个队伍最多赢四个队，而从而间接胜12个队（实际上这也不可能同时出现）
+qz=1/((duishu-1)*(duishu-2)+1)
+#一般队伍：权重=1/((n-1)*(n-2)+1)
+for m in range(0,duishu):
+    for n in range(0,duishu):
+        if situation[m,n]==1:
+            s2=sum(situation[n])*qz
+            he[m]=he[m]+s2
+#这里已经将每个队伍的分数有层次的排出了，下一步要建立队伍与次序的关系
+duiwu=[]
+for w in range(0,duishu):
+    shunxu=w+1
+    duiming=str(shunxu)
+    duiwu.append(duiming)
+zidian=dict(zip(he,duiwu))
+#构建了队伍和分数的关系，接下来要进行的只有排序
+he.sort(reverse=True)
+paixu=[]
+for k in range(0,duishu):
+    wz=zidian.get(he[k])
+    paixu.append(wz)
+print(paixu)
+#此时已经可以排出顺序了，只要改变打分矩阵以及输入队伍数量就可以，接下来将进行可视化
+plt.bar(paixu,he,fc='r',width=0.6)
+plt.title('比赛队伍得分排序')
+plt.savefig('比赛队伍得分排序检验')
+plt.show()
+
